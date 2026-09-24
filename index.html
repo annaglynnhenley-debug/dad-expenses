@@ -1,0 +1,560 @@
+<!DOCTYPE html>
+<html lang="en-GB">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<meta name="theme-color" content="#1D428A">
+<meta name="apple-mobile-web-app-capable" content="yes">
+<meta name="apple-mobile-web-app-title" content="My Expenses">
+<title>My Work Expenses</title>
+<link rel="icon" href="data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'><rect width='100' height='100' rx='20' fill='%231D428A'/><text x='50' y='70' font-size='60' text-anchor='middle' fill='%23FFCD00' font-family='Arial' font-weight='bold'>£</text></svg>">
+<style>
+  :root {
+    --blue: #1D428A;
+    --blue-dark: #142F63;
+    --yellow: #FFCD00;
+    --white: #FFFFFF;
+    --bg: #F4F6FA;
+    --ink: #111827;
+    --muted: #4B5563;
+    --line: #D6DCE8;
+    --red: #B42318;
+    --green: #067647;
+  }
+  * { box-sizing: border-box; }
+  html { -webkit-text-size-adjust: 100%; }
+  body {
+    margin: 0;
+    background: var(--bg);
+    color: var(--ink);
+    font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Arial, sans-serif;
+    font-size: 20px;
+    line-height: 1.45;
+  }
+  button, input, textarea { font: inherit; color: inherit; }
+  button { cursor: pointer; }
+  :focus-visible { outline: 4px solid var(--yellow); outline-offset: 2px; }
+
+  /* ---------- Header ---------- */
+  header {
+    background: var(--blue);
+    color: var(--white);
+    border-bottom: 10px solid var(--yellow);
+    padding: 22px 16px 18px;
+    text-align: center;
+  }
+  header h1 { margin: 0; font-size: 32px; letter-spacing: .5px; }
+  header p { margin: 4px 0 0; color: var(--yellow); font-weight: 700; letter-spacing: 2px; text-transform: uppercase; font-size: 15px; }
+
+  main { max-width: 720px; margin: 0 auto; padding: 16px 16px 60px; }
+
+  .birthday {
+    background: var(--yellow);
+    color: var(--blue-dark);
+    border-radius: 16px;
+    padding: 18px 20px;
+    margin: 0 0 20px;
+    display: flex; gap: 12px; align-items: flex-start; justify-content: space-between;
+    font-weight: 700;
+  }
+  .birthday .msg { font-size: 22px; }
+  .birthday .msg small { display: block; font-weight: 500; font-size: 17px; margin-top: 4px; }
+  .birthday button {
+    background: var(--blue); color: var(--white); border: 0; border-radius: 10px;
+    padding: 8px 14px; font-size: 16px; font-weight: 700; flex-shrink: 0;
+  }
+
+  .card {
+    background: var(--white);
+    border-radius: 18px;
+    padding: 22px 20px;
+    margin-bottom: 20px;
+    box-shadow: 0 1px 2px rgba(0,0,0,.06), 0 4px 16px rgba(29,66,138,.06);
+  }
+  h2 { margin: 0 0 16px; font-size: 26px; color: var(--blue); }
+  .step { font-weight: 700; font-size: 21px; margin: 22px 0 10px; }
+  .step:first-of-type { margin-top: 0; }
+  .step .num {
+    display: inline-flex; align-items: center; justify-content: center;
+    width: 32px; height: 32px; border-radius: 50%;
+    background: var(--blue); color: var(--white); font-size: 17px; margin-right: 8px;
+  }
+
+  /* ---------- Category buttons ---------- */
+  .cats { display: grid; grid-template-columns: repeat(2, 1fr); gap: 10px; }
+  @media (min-width: 560px) { .cats { grid-template-columns: repeat(4, 1fr); } }
+  .cat {
+    background: var(--white);
+    border: 3px solid var(--line);
+    border-radius: 14px;
+    padding: 14px 8px;
+    min-height: 96px;
+    display: flex; flex-direction: column; align-items: center; justify-content: center; gap: 4px;
+    font-weight: 700; font-size: 19px;
+  }
+  .cat .icon { font-size: 34px; line-height: 1; }
+  .cat[aria-pressed="true"] { border-color: var(--blue); background: #E8EEFA; box-shadow: inset 0 0 0 2px var(--blue); }
+  .hint {
+    margin-top: 10px; padding: 10px 14px; border-radius: 10px;
+    background: #FFF8D6; color: #5C4A00; font-size: 17px; min-height: 1em;
+  }
+  .hint:empty { display: none; }
+  .hint .quip { display: block; font-size: 22px; color: var(--blue-dark); }
+
+  /* ---------- Inputs ---------- */
+  .money {
+    display: flex; align-items: center;
+    border: 3px solid var(--line); border-radius: 14px; background: var(--white);
+    overflow: hidden; max-width: 320px;
+  }
+  .money:focus-within { border-color: var(--blue); }
+  .money span { padding: 0 6px 0 18px; font-size: 34px; font-weight: 700; color: var(--blue); }
+  .money input {
+    border: 0; outline: none; width: 100%; padding: 12px 12px 12px 4px;
+    font-size: 34px; font-weight: 700; background: transparent;
+  }
+  .days { display: flex; flex-wrap: wrap; gap: 10px; }
+  .day {
+    background: var(--white); border: 3px solid var(--line); border-radius: 12px;
+    padding: 12px 18px; font-weight: 700; font-size: 19px; min-height: 56px;
+  }
+  .day[aria-pressed="true"] { border-color: var(--blue); background: #E8EEFA; }
+  input[type="date"] {
+    border: 3px solid var(--line); border-radius: 12px; padding: 10px 12px; font-size: 19px;
+    min-height: 56px; background: var(--white);
+  }
+  textarea {
+    width: 100%; border: 3px solid var(--line); border-radius: 14px; padding: 12px 14px;
+    font-size: 19px; resize: vertical; min-height: 64px;
+  }
+  textarea:focus, input[type="date"]:focus { border-color: var(--blue); outline: none; }
+  .optional { font-weight: 400; color: var(--muted); font-size: 17px; }
+
+  .save {
+    margin-top: 24px; width: 100%;
+    background: var(--yellow); color: var(--blue-dark);
+    border: 0; border-bottom: 5px solid #D9AE00; border-radius: 16px;
+    padding: 18px; font-size: 26px; font-weight: 800;
+  }
+  .save:active { transform: translateY(2px); border-bottom-width: 3px; }
+  .error { color: var(--red); font-weight: 700; margin-top: 10px; }
+  .error:empty { display: none; }
+
+  /* ---------- Month summary ---------- */
+  .monthnav { display: flex; align-items: center; justify-content: space-between; gap: 10px; }
+  .monthnav button {
+    background: var(--blue); color: var(--white); border: 0; border-radius: 12px;
+    width: 56px; height: 56px; font-size: 26px; font-weight: 700; flex-shrink: 0;
+  }
+  .monthnav button:disabled { opacity: .3; cursor: default; }
+  .monthnav .label { text-align: center; font-size: 24px; font-weight: 800; color: var(--blue); }
+  .total {
+    text-align: center; margin: 18px 0 6px;
+    background: var(--blue); color: var(--white); border-radius: 16px; padding: 16px;
+  }
+  .total .big { font-size: 44px; font-weight: 800; color: var(--yellow); line-height: 1.1; }
+  .total .sub { font-size: 17px; }
+  .breakdown { list-style: none; padding: 0; margin: 16px 0 0; }
+  .breakdown li {
+    display: flex; justify-content: space-between; padding: 8px 4px;
+    border-bottom: 1px solid var(--line); font-size: 19px;
+  }
+  .breakdown li b { font-variant-numeric: tabular-nums; }
+
+  .items { list-style: none; padding: 0; margin: 20px 0 0; }
+  .items li {
+    display: flex; align-items: center; gap: 12px;
+    padding: 14px 4px; border-bottom: 1px solid var(--line);
+  }
+  .items .icon { font-size: 30px; width: 40px; text-align: center; flex-shrink: 0; }
+  .items .info { flex: 1; min-width: 0; }
+  .items .what { font-weight: 700; }
+  .items .when { color: var(--muted); font-size: 17px; }
+  .items .note { color: var(--muted); font-size: 17px; overflow-wrap: anywhere; }
+  .items .amt { font-weight: 800; font-size: 21px; font-variant-numeric: tabular-nums; }
+  .items .del {
+    background: var(--white); color: var(--red); border: 2px solid #F3C4C0; border-radius: 10px;
+    padding: 6px 10px; font-size: 15px; font-weight: 700;
+  }
+  .empty { text-align: center; color: var(--muted); padding: 20px 0 6px; }
+
+  .actions { display: grid; gap: 10px; margin-top: 20px; }
+  @media (min-width: 560px) { .actions { grid-template-columns: 1fr 1fr; } }
+  .btn {
+    background: var(--white); color: var(--blue); border: 3px solid var(--blue); border-radius: 14px;
+    padding: 14px; font-size: 19px; font-weight: 800; min-height: 60px;
+  }
+
+  details.card summary { font-size: 22px; font-weight: 800; color: var(--blue); cursor: pointer; }
+  details.card p { color: var(--muted); font-size: 18px; }
+
+  .toast {
+    position: fixed; left: 50%; bottom: 24px; transform: translateX(-50%) translateY(150%);
+    background: var(--green); color: var(--white); font-weight: 800; font-size: 21px;
+    padding: 16px 24px; border-radius: 14px; box-shadow: 0 8px 24px rgba(0,0,0,.25);
+    transition: transform .25s ease; max-width: calc(100% - 32px); text-align: center; z-index: 10;
+  }
+  .toast.show { transform: translateX(-50%) translateY(0); }
+
+  footer { text-align: center; color: var(--muted); font-size: 16px; padding: 10px 16px 30px; }
+
+  .print-only { display: none; }
+  @media print {
+    body { background: #fff; font-size: 12pt; }
+    header, .birthday, #addCard, .monthnav button, .actions, details, .del, .toast, footer { display: none !important; }
+    .card { box-shadow: none; padding: 0; }
+    .print-only { display: block; }
+    .total { background: #fff; color: #000; border: 2px solid #000; }
+    .total .big { color: #000; }
+  }
+</style>
+</head>
+<body>
+
+<header>
+  <h1>My Work Expenses</h1>
+  <p>Marching On Together 💛💙</p>
+</header>
+
+<main>
+  <div class="birthday" id="birthday" hidden>
+    <div class="msg">🎂 Happy Birthday Dad!
+      <small>No more receipts in a shoebox. Tap a button, type the amount, done. Love you x</small>
+    </div>
+    <button type="button" id="hideBirthday">Hide</button>
+  </div>
+
+  <!-- ADD AN EXPENSE -->
+  <section class="card" id="addCard" aria-labelledby="addTitle">
+    <h2 id="addTitle">Add something you paid for</h2>
+
+    <div class="step"><span class="num">1</span>What was it?</div>
+    <div class="cats" id="cats" role="group" aria-label="What was it"></div>
+    <div class="hint" id="hint" aria-live="polite"></div>
+
+    <div class="step"><label for="amount"><span class="num">2</span>How much?</label></div>
+    <div class="money">
+      <span aria-hidden="true">£</span>
+      <input id="amount" type="text" inputmode="decimal" autocomplete="off" placeholder="0.00" aria-label="Amount in pounds">
+    </div>
+
+    <div class="step"><span class="num">3</span>When?</div>
+    <div class="days" role="group" aria-label="When">
+      <button type="button" class="day" data-day="0" aria-pressed="true">Today</button>
+      <button type="button" class="day" data-day="1" aria-pressed="false">Yesterday</button>
+      <input type="date" id="date" aria-label="Or pick a date">
+    </div>
+
+    <div class="step"><label for="note"><span class="num">4</span>Anything to remember? <span class="optional">(you can leave this blank)</span></label></div>
+    <textarea id="note" rows="2" placeholder="e.g. Leeds to London for the Smith meeting"></textarea>
+
+    <div class="error" id="error" role="alert"></div>
+    <button type="button" class="save" id="save">✔ Save it</button>
+  </section>
+
+  <!-- MONTH SUMMARY -->
+  <section class="card" aria-labelledby="monthLabel">
+    <h2 class="print-only">Work expenses</h2>
+    <div class="monthnav">
+      <button type="button" id="prev" aria-label="Previous month">◀</button>
+      <div class="label" id="monthLabel"></div>
+      <button type="button" id="next" aria-label="Next month">▶</button>
+    </div>
+
+    <div class="total">
+      <div class="sub">Total this month</div>
+      <div class="big" id="total">£0.00</div>
+      <div class="sub" id="count"></div>
+    </div>
+
+    <ul class="breakdown" id="breakdown"></ul>
+    <ul class="items" id="items"></ul>
+
+    <div class="actions">
+      <button type="button" class="btn" id="print">🖨 Print this month</button>
+      <button type="button" class="btn" id="csv">📄 Save for the accountant</button>
+    </div>
+  </section>
+
+  <!-- SAFETY -->
+  <details class="card">
+    <summary>Keeping it safe (backups)</summary>
+    <p>Everything is saved on this phone or computer only. Every few months, tap “Make a backup” and email the file to yourself, just in case.</p>
+    <div class="actions">
+      <button type="button" class="btn" id="backup">💾 Make a backup</button>
+      <button type="button" class="btn" id="restoreBtn">📂 Load a backup</button>
+    </div>
+    <input type="file" id="restore" accept=".json,application/json" hidden>
+    <p>Not sure if something counts? Save it anyway, write a note, and keep the receipt. Your accountant can decide.</p>
+  </details>
+</main>
+
+<footer>Made with love for Dad 💛💙</footer>
+
+<div class="toast" id="toast" role="status" aria-live="polite"></div>
+
+<script>
+(function () {
+  var KEY = 'dadExpenses.v1';
+  var BDAY_KEY = 'dadExpenses.birthdayHidden';
+
+  var CATS = [
+    { id: 'coffee',  icon: '☕', name: 'Coffee',   quip: 'Another flat white? ☕😄', hint: 'Coffee is usually only claimable when you’re away from your normal workplace for work.' },
+    { id: 'lunch',   icon: '🥪', name: 'Food',     quip: 'Yum Yum 😋', hint: 'Meals are usually only claimable when you’re travelling for work.' },
+    { id: 'train',   icon: '🚆', name: 'Train',    quip: 'ZOOOOOM 🚆💨', hint: 'Train fares for work trips are usually claimable. Keep the ticket or email.' },
+    { id: 'taxi',    icon: '🚕', name: 'Taxi',     hint: 'Taxis for work trips are usually claimable. Ask for a receipt.' },
+    { id: 'bus',     icon: '🚌', name: 'Bus / Tube', hint: 'Bus and Tube fares for work trips are usually claimable.' },
+    { id: 'hotel',   icon: '🏨', name: 'Hotel',    hint: 'Hotels for overnight work trips are usually claimable.' },
+    { id: 'parking', icon: '🅿️', name: 'Parking',  hint: 'Parking on work trips is usually claimable. Parking fines are not.' },
+    { id: 'other',   icon: '🧾', name: 'Other',    hint: 'Write a note so you remember what it was.' }
+  ];
+  var CAT_BY_ID = {};
+  CATS.forEach(function (c) { CAT_BY_ID[c.id] = c; });
+
+  // ---------- storage ----------
+  function load() {
+    try { var raw = localStorage.getItem(KEY); return raw ? JSON.parse(raw) : []; }
+    catch (e) { return []; }
+  }
+  function store() {
+    try { localStorage.setItem(KEY, JSON.stringify(expenses)); return true; }
+    catch (e) { return false; }
+  }
+  var expenses = load();
+
+  // ---------- helpers ----------
+  var $ = function (id) { return document.getElementById(id); };
+  function pad(n) { return (n < 10 ? '0' : '') + n; }
+  function isoDate(d) { return d.getFullYear() + '-' + pad(d.getMonth() + 1) + '-' + pad(d.getDate()); }
+  function parseIso(s) { var p = s.split('-'); return new Date(+p[0], +p[1] - 1, +p[2]); }
+  function money(pence) { return '£' + (pence / 100).toLocaleString('en-GB', { minimumFractionDigits: 2, maximumFractionDigits: 2 }); }
+  function monthKey(d) { return d.getFullYear() + '-' + pad(d.getMonth() + 1); }
+  function niceDate(s) { return parseIso(s).toLocaleDateString('en-GB', { weekday: 'short', day: 'numeric', month: 'short' }); }
+  function niceMonth(key) { return parseIso(key + '-01').toLocaleDateString('en-GB', { month: 'long', year: 'numeric' }); }
+  function esc(s) { return String(s).replace(/[&<>"']/g, function (c) { return { '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;', "'": '&#39;' }[c]; }); }
+
+  var toastTimer;
+  function toast(msg) {
+    var t = $('toast');
+    t.textContent = msg;
+    t.classList.add('show');
+    clearTimeout(toastTimer);
+    toastTimer = setTimeout(function () { t.classList.remove('show'); }, 2600);
+  }
+
+  function download(filename, content, type) {
+    var blob = new Blob([content], { type: type });
+    var a = document.createElement('a');
+    a.href = URL.createObjectURL(blob);
+    a.download = filename;
+    document.body.appendChild(a);
+    a.click();
+    setTimeout(function () { URL.revokeObjectURL(a.href); a.remove(); }, 1000);
+  }
+
+  // ---------- birthday banner ----------
+  var bdayHidden = false;
+  try { bdayHidden = localStorage.getItem(BDAY_KEY) === '1'; } catch (e) {}
+  $('birthday').hidden = bdayHidden;
+  $('hideBirthday').onclick = function () {
+    $('birthday').hidden = true;
+    try { localStorage.setItem(BDAY_KEY, '1'); } catch (e) {}
+  };
+
+  // ---------- add form ----------
+  var chosenCat = null;
+  var catsEl = $('cats');
+  CATS.forEach(function (c) {
+    var b = document.createElement('button');
+    b.type = 'button';
+    b.className = 'cat';
+    b.setAttribute('aria-pressed', 'false');
+    b.dataset.cat = c.id;
+    b.innerHTML = '<span class="icon" aria-hidden="true">' + c.icon + '</span>' + esc(c.name);
+    b.onclick = function () { pickCat(c.id); };
+    catsEl.appendChild(b);
+  });
+  function pickCat(id) {
+    chosenCat = id;
+    catsEl.querySelectorAll('.cat').forEach(function (b) {
+      b.setAttribute('aria-pressed', b.dataset.cat === id ? 'true' : 'false');
+    });
+    var c = id && CAT_BY_ID[id];
+    $('hint').innerHTML = c && c.quip ? '<strong class="quip">' + esc(c.quip) + '</strong>' : '';
+    $('error').textContent = '';
+  }
+
+  var dateInput = $('date');
+  function setDay(offset) {
+    var d = new Date(); d.setDate(d.getDate() - offset);
+    dateInput.value = isoDate(d);
+    syncDayButtons();
+  }
+  function syncDayButtons() {
+    var today = isoDate(new Date());
+    var y = new Date(); y.setDate(y.getDate() - 1);
+    var yest = isoDate(y);
+    document.querySelectorAll('.day').forEach(function (b) {
+      var match = (b.dataset.day === '0' && dateInput.value === today) || (b.dataset.day === '1' && dateInput.value === yest);
+      b.setAttribute('aria-pressed', match ? 'true' : 'false');
+    });
+  }
+  document.querySelectorAll('.day').forEach(function (b) {
+    b.onclick = function () { setDay(+b.dataset.day); };
+  });
+  dateInput.max = isoDate(new Date());
+  dateInput.addEventListener('change', syncDayButtons);
+  setDay(0);
+
+  $('save').onclick = function () {
+    var err = $('error');
+    if (!chosenCat) { err.textContent = 'Tap what it was for first (step 1).'; return; }
+    var raw = $('amount').value.replace(/[£,\s]/g, '');
+    var num = parseFloat(raw);
+    if (!raw || isNaN(num) || num <= 0 || !/^\d*\.?\d{0,2}$/.test(raw)) {
+      err.textContent = 'Type how much it was, like 4.50 (step 2).';
+      $('amount').focus();
+      return;
+    }
+    if (!dateInput.value) { err.textContent = 'Pick a date (step 3).'; return; }
+    err.textContent = '';
+
+    var item = {
+      id: Date.now().toString(36) + Math.random().toString(36).slice(2, 6),
+      cat: chosenCat,
+      pence: Math.round(num * 100),
+      date: dateInput.value,
+      note: $('note').value.trim()
+    };
+    expenses.push(item);
+    var ok = store();
+
+    viewMonth = item.date.slice(0, 7);
+    render();
+    toast(ok ? 'Saved! ' + money(item.pence) + ' ' + CAT_BY_ID[item.cat].name.toLowerCase() + ' ✔'
+             : 'Hmm, couldn’t save on this device. Try another browser.');
+
+    $('amount').value = '';
+    $('note').value = '';
+    pickCat(null);
+    setDay(0);
+    window.scrollTo({ top: 0, behavior: 'smooth' });
+  };
+
+  // ---------- month view ----------
+  var viewMonth = monthKey(new Date());
+  function shiftMonth(delta) {
+    var d = parseIso(viewMonth + '-01');
+    d.setMonth(d.getMonth() + delta);
+    viewMonth = monthKey(d);
+    render();
+  }
+  $('prev').onclick = function () { shiftMonth(-1); };
+  $('next').onclick = function () { shiftMonth(1); };
+
+  function monthItems() {
+    return expenses
+      .filter(function (e) { return e.date.slice(0, 7) === viewMonth; })
+      .sort(function (a, b) { return a.date < b.date ? 1 : a.date > b.date ? -1 : 0; });
+  }
+
+  function render() {
+    $('monthLabel').textContent = niceMonth(viewMonth);
+    $('next').disabled = viewMonth >= monthKey(new Date());
+
+    var list = monthItems();
+    var total = 0, byCat = {};
+    list.forEach(function (e) { total += e.pence; byCat[e.cat] = (byCat[e.cat] || 0) + e.pence; });
+
+    $('total').textContent = money(total);
+    $('count').textContent = list.length === 1 ? '1 thing' : list.length + ' things';
+
+    $('breakdown').innerHTML = CATS.filter(function (c) { return byCat[c.id]; }).map(function (c) {
+      return '<li><span>' + c.icon + ' ' + esc(c.name) + '</span><b>' + money(byCat[c.id]) + '</b></li>';
+    }).join('');
+
+    $('items').innerHTML = list.length ? list.map(function (e) {
+      var c = CAT_BY_ID[e.cat] || CAT_BY_ID.other;
+      return '<li>' +
+        '<span class="icon" aria-hidden="true">' + c.icon + '</span>' +
+        '<div class="info"><div class="what">' + esc(c.name) + '</div>' +
+        '<div class="when">' + niceDate(e.date) + '</div>' +
+        (e.note ? '<div class="note">' + esc(e.note) + '</div>' : '') + '</div>' +
+        '<span class="amt">' + money(e.pence) + '</span>' +
+        '<button type="button" class="del" data-id="' + e.id + '" aria-label="Delete ' + esc(c.name) + ' ' + money(e.pence) + '">Delete</button>' +
+        '</li>';
+    }).join('') : '<li class="empty">Nothing saved for this month yet.</li>';
+
+    $('items').querySelectorAll('.del').forEach(function (b) {
+      b.onclick = function () {
+        var e = expenses.find(function (x) { return x.id === b.dataset.id; });
+        if (!e) return;
+        if (!confirm('Delete ' + CAT_BY_ID[e.cat].name + ' ' + money(e.pence) + ' on ' + niceDate(e.date) + '?')) return;
+        expenses = expenses.filter(function (x) { return x.id !== e.id; });
+        store();
+        render();
+        toast('Deleted');
+      };
+    });
+  }
+
+  // ---------- print / export ----------
+  $('print').onclick = function () { window.print(); };
+
+  $('csv').onclick = function () {
+    var list = monthItems().slice().reverse();
+    if (!list.length) { toast('Nothing to save for this month'); return; }
+    var q = function (s) { return '"' + String(s).replace(/"/g, '""') + '"'; };
+    var rows = [['Date', 'What', 'Amount (£)', 'Notes']];
+    var total = 0;
+    list.forEach(function (e) {
+      total += e.pence;
+      rows.push([parseIso(e.date).toLocaleDateString('en-GB'), CAT_BY_ID[e.cat].name, (e.pence / 100).toFixed(2), e.note]);
+    });
+    rows.push([]);
+    rows.push(['', 'TOTAL', (total / 100).toFixed(2), '']);
+    var csv = '﻿' + rows.map(function (r) { return r.map(q).join(','); }).join('\r\n');
+    download('expenses-' + viewMonth + '.csv', csv, 'text/csv;charset=utf-8');
+    toast('Saved a file you can email to your accountant');
+  };
+
+  // ---------- backup / restore ----------
+  $('backup').onclick = function () {
+    download('expenses-backup-' + isoDate(new Date()) + '.json', JSON.stringify({ version: 1, expenses: expenses }, null, 1), 'application/json');
+    toast('Backup saved');
+  };
+  $('restoreBtn').onclick = function () { $('restore').click(); };
+  $('restore').onchange = function () {
+    var file = this.files[0];
+    if (!file) return;
+    var reader = new FileReader();
+    reader.onload = function () {
+      try {
+        var data = JSON.parse(reader.result);
+        var incoming = Array.isArray(data) ? data : data.expenses;
+        if (!Array.isArray(incoming)) throw new Error();
+        var have = {};
+        expenses.forEach(function (e) { have[e.id] = true; });
+        var added = 0;
+        incoming.forEach(function (e) {
+          if (e && e.id && !have[e.id] && CAT_BY_ID[e.cat] && typeof e.pence === 'number' && /^\d{4}-\d{2}-\d{2}$/.test(e.date)) {
+            expenses.push({ id: e.id, cat: e.cat, pence: e.pence, date: e.date, note: String(e.note || '') });
+            added++;
+          }
+        });
+        store();
+        render();
+        toast(added ? 'Loaded ' + added + ' expenses from backup' : 'Nothing new in that backup');
+      } catch (e) {
+        toast('That doesn’t look like a backup file');
+      }
+    };
+    reader.readAsText(file);
+    this.value = '';
+  };
+
+  render();
+})();
+</script>
+</body>
+</html>
