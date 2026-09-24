@@ -50,7 +50,7 @@
     -webkit-font-smoothing: antialiased;
   }
   body.locked { overflow: hidden; }
-  button, input { font: inherit; color: inherit; }
+  button, input, textarea { font: inherit; color: inherit; }
   button { cursor: pointer; background: none; border: 0; padding: 0; }
   :focus-visible { outline: 2px solid var(--accent); outline-offset: 3px; border-radius: 4px; }
   .num { font-variant-numeric: lining-nums tabular-nums; }
@@ -110,16 +110,30 @@
 
   /* ---------- Birthday note ---------- */
   .note-card {
-    margin: 28px 0 0; padding: 16px 18px; border-radius: var(--r);
-    background: var(--surface); border: 1px solid var(--line);
-    display: flex; gap: 14px; align-items: flex-start;
+    position: relative; overflow: hidden;
+    margin: 28px 0 0; padding: 40px 24px 30px; border-radius: var(--r-lg);
+    background: var(--leeds-blue); color: #fff;
+    box-shadow: 0 12px 32px rgba(29,66,138,.22);
   }
-  .note-card .dot { width: 10px; height: 10px; border-radius: 50%; background: var(--gold); margin-top: 8px; flex-shrink: 0; }
-  .note-card .txt { flex: 1; }
-  .note-card strong { font-family: var(--serif); font-weight: 500; font-size: 20px; display: block; }
-  .note-card p { margin: 2px 0 0; color: var(--ink-2); font-size: 15px; }
-  .link-btn { color: var(--muted); font-size: 14px; font-weight: 500; padding: 6px 8px; border-radius: var(--r-sm); }
-  .link-btn:hover { color: var(--ink); background: rgba(22,35,58,.05); }
+  @media (min-width: 600px) { .note-card { padding: 48px 44px 40px; } }
+  .note-card::before {
+    content: ""; position: absolute; left: 0; right: 0; top: 0; height: 10px;
+    background: linear-gradient(to bottom, var(--leeds-yellow) 0 6px, #fff 6px 10px);
+  }
+  .note-card .salute { padding-right: 104px; font-family: var(--serif); font-size: clamp(30px, 7vw, 40px); line-height: 1.15; margin: 0 0 14px; }
+  .note-card .msg { font-family: var(--serif); font-size: clamp(22px, 5vw, 28px); line-height: 1.35; margin: 0 0 24px; max-width: 30ch; }
+  .note-card .msg em { color: var(--leeds-yellow); font-style: normal; }
+  .note-card .sign { font-family: var(--serif); font-style: italic; font-size: clamp(20px, 4.5vw, 24px); line-height: 1.4; margin: 0; }
+  .note-card .sign b { font-weight: 500; font-style: normal; color: var(--leeds-yellow); }
+  .link-btn {
+    position: absolute; top: 20px; right: 16px;
+    color: #fff; font-size: 15px; font-weight: 500; padding: 0 16px; height: 40px;
+    border: 1px solid rgba(255,255,255,.5); border-radius: 999px;
+    transition: background .15s var(--ease), border-color .15s var(--ease);
+  }
+  .link-btn:hover { background: rgba(255,255,255,.12); border-color: #fff; }
+  .link-btn:focus-visible { outline-color: var(--leeds-yellow); }
+  @media (min-width: 600px) { .link-btn { top: 26px; right: 24px; } }
 
   /* ---------- Stats ---------- */
   .stats {
@@ -203,6 +217,27 @@
   .row .desc { display: block; font-weight: 500; overflow-wrap: anywhere; line-height: 1.35; }
   .row .sub { display: block; font-size: 14px; color: var(--muted); }
   .row .amt { font-weight: 500; font-size: 17px; text-align: right; }
+
+  /* Waiting for a train? */
+  .facts { margin: 20px 0 0; text-align: center; padding-top: 24px; padding-bottom: 24px; }
+  .facts .fact-tag { margin-top: 22px !important; }
+  .facts .fact-tag { font-size: 12px; font-weight: 600; letter-spacing: .12em; text-transform: uppercase; color: var(--accent); margin: 0 0 10px; min-height: 18px; }
+  .facts .fact-text {
+    font-family: var(--serif); font-size: clamp(21px, 4.6vw, 26px); line-height: 1.4; margin: 0 auto; max-width: 34ch;
+    transition: opacity .2s var(--ease);
+  }
+  .facts .fact-text.fade { opacity: 0; }
+  .btn-train { background: var(--leeds-blue); height: 44px; padding: 0 18px; font-size: 15px; gap: 7px; }
+  .btn-train:hover { background: var(--accent-hover); }
+  .btn-train svg.i { width: 17px; height: 17px; stroke-width: 1.8; color: var(--leeds-yellow); }
+  .facts .fact-count { margin: 12px 0 0; font-size: 13px; color: var(--muted); }
+  .facts .fact-count:empty { display: none; }
+  .fact-close {
+    margin-top: 14px; height: 40px; padding: 0 16px; border-radius: 999px;
+    border: 1px solid var(--line-strong); color: var(--ink-2); font-size: 14px; font-weight: 500;
+    transition: border-color .15s var(--ease), background .15s var(--ease);
+  }
+  .fact-close:hover { border-color: var(--accent); background: var(--accent-soft); }
 
   /* Records */
   .records { margin: 20px 0 0; }
@@ -290,6 +325,7 @@
   }
   .text-input:focus, .date-input:focus { outline: none; border-color: var(--accent); box-shadow: 0 0 0 3px var(--accent-soft); }
   .text-input::placeholder { color: #9A9EA5; }
+  textarea.text-input { height: auto; min-height: 76px; padding: 12px 14px; line-height: 1.4; resize: none; display: block; }
 
   .cats { display: grid; grid-template-columns: repeat(4, 1fr); gap: 8px; }
   .cat {
@@ -410,12 +446,10 @@
     </div>
 
     <div class="note-card" id="birthday" hidden>
-      <span class="dot" aria-hidden="true"></span>
-      <div class="txt">
-        <strong>Happy birthday, Dad.</strong>
-        <p>No more receipts in a shoebox. Tap “Add expense”, type the amount, done. Love you x</p>
-      </div>
-      <button type="button" class="link-btn" id="hideBirthday">Dismiss</button>
+      <p class="salute">Dear Dad,</p>
+      <p class="msg">Happy <em>59th</em> birthday, hopefully this makes more sense than Excel!!</p>
+      <p class="sign">Lots of love,<br><b>Anna xxx</b></p>
+      <button type="button" class="link-btn" id="hideBirthday" aria-label="Dismiss birthday message">Dismiss</button>
     </div>
 
     <div class="pitchline" aria-hidden="true"></div>
@@ -444,6 +478,14 @@
       <div id="list"></div>
     </section>
   </div>
+
+  <section class="panel facts" aria-label="Fun facts">
+    <button type="button" class="btn-primary btn-train" id="factBtn"><svg class="i" aria-hidden="true"><use href="#i-train"/></svg>Waiting for a train?</button>
+    <p class="fact-tag" id="factTag" hidden></p>
+    <p class="fact-text" id="factText" aria-live="polite" hidden></p>
+    <p class="fact-count" id="factCount"></p>
+    <button type="button" class="fact-close" id="factClose" hidden>Close fact</button>
+  </section>
 
   <section class="panel records" aria-labelledby="recTitle">
     <div class="panel-head"><h2 id="recTitle">Records &amp; backups</h2></div>
@@ -505,7 +547,7 @@
 
     <div class="field">
       <label class="lbl" for="note">Description <span class="opt">(optional)</span></label>
-      <input id="note" class="text-input" type="text" maxlength="120" autocomplete="off" placeholder="e.g. Leeds to London, Smith meeting">
+      <textarea id="note" class="text-input" rows="2" maxlength="120" autocomplete="off" placeholder="e.g. uhhh flat white please, oat milk please, yes takeaway please"></textarea>
     </div>
 
     <div class="sheet-actions">
@@ -738,6 +780,10 @@
   // ---------- add / edit sheet ----------
   var sheet = $('sheet'), backdrop = $('backdrop'), form = $('form');
   var amountEl = $('amount'), dateInput = $('date'), noteEl = $('note');
+  // Enter saves, like a normal one-line box.
+  noteEl.addEventListener('keydown', function (ev) {
+    if (ev.key === 'Enter' && !ev.shiftKey) { ev.preventDefault(); form.requestSubmit ? form.requestSubmit() : $('saveBtn').click(); }
+  });
   var chosenCat = null, editingId = null, returnFocus = null;
 
   var catsEl = $('cats');
@@ -836,7 +882,7 @@
     if (!sheet.classList.contains('open')) return;
     if (ev.key === 'Escape') { closeSheet(); return; }
     if (ev.key === 'Tab') {
-      var f = Array.prototype.filter.call(sheet.querySelectorAll('button, input'), function (x) { return !x.hidden && !x.disabled && x.offsetParent !== null; });
+      var f = Array.prototype.filter.call(sheet.querySelectorAll('button, input, textarea'), function (x) { return !x.hidden && !x.disabled && x.offsetParent !== null; });
       var first = f[0], last = f[f.length - 1];
       if (ev.shiftKey && document.activeElement === first) { ev.preventDefault(); last.focus(); }
       else if (!ev.shiftKey && document.activeElement === last) { ev.preventDefault(); first.focus(); }
@@ -866,7 +912,7 @@
     }
     if (firstBad) { firstBad.focus(); return; }
 
-    var data = { cat: chosenCat, pence: Math.round(num * 100), date: dateInput.value, note: noteEl.value.trim() };
+    var data = { cat: chosenCat, pence: Math.round(num * 100), date: dateInput.value, note: noteEl.value.replace(/\s+/g, ' ').trim() };
     var item;
     if (editingId) {
       item = expenses.find(function (x) { return x.id === editingId; });
@@ -952,6 +998,193 @@
     };
     reader.readAsText(file);
     this.value = '';
+  };
+
+  // ---------- Waiting for a train? ----------
+  var FACTS = [
+    ["Leeds United", "Leeds United were formed in 1919, after Leeds City were expelled from the Football League over illegal payments to players."],
+    ["Leeds United", "The club’s old nickname, “The Peacocks”, comes from the Old Peacock pub that stood opposite Elland Road."],
+    ["Leeds United", "Don Revie switched Leeds to an all-white kit in the 1960s, inspired by Real Madrid."],
+    ["Leeds United", "Leeds were the last ever champions of the old First Division, winning the title in 1991–92."],
+    ["Leeds United", "Howard Wilkinson, who led Leeds to the 1992 title, is still the last English manager to win England’s top division."],
+    ["Leeds United", "Jack Charlton holds Leeds United’s appearance record, with 773 games for the club."],
+    ["Leeds United", "Peter Lorimer is Leeds United’s all-time record goalscorer. His ferocious shot earned him the nickname “Hotshot”."],
+    ["Leeds United", "Brian Clough managed Leeds for just 44 days in 1974."],
+    ["Leeds United", "Leeds won the FA Cup in 1972, beating Arsenal 1–0 at Wembley with an Allan Clarke header."],
+    ["Leeds United", "Leeds won their first major trophy, the League Cup, in 1968, beating Arsenal 1–0 with a Terry Cooper goal."],
+    ["Leeds United", "Leeds won the Inter-Cities Fairs Cup twice, in 1968 and 1971."],
+    ["Leeds United", "Leeds reached the European Cup final in 1975, losing to Bayern Munich in Paris."],
+    ["Leeds United", "In 2001 Leeds reached the semi-finals of the Champions League, losing to Valencia."],
+    ["Leeds United", "“Marching On Together” first appeared in 1972, as the B-side of the team’s single “Leeds United”."],
+    ["Leeds United", "Marcelo Bielsa took Leeds back to the Premier League in 2020, ending 16 years outside the top flight."],
+    ["Leeds United", "Welsh legend John Charles, “The Gentle Giant”, starred for Leeds at both centre-forward and centre-half before joining Juventus in 1957."],
+    ["Leeds United", "A statue of Billy Bremner, Don Revie’s fiery captain, stands outside Elland Road."],
+    ["Leeds United", "Eric Cantona won the league with Leeds in 1992, then moved to Manchester United later that year."],
+    ["Leeds United", "Leeds won their first league title in 1968–69, losing only two of their 42 games."],
+    ["Leeds United", "Leeds started the 1973–74 season with a 29-match unbeaten run, and went on to win the title."],
+    ["Leeds United", "Don Revie left Leeds in 1974 to become manager of England."],
+    ["Leeds United", "Lucas Radebe, the much-loved Leeds captain, used to play for Kaizer Chiefs in South Africa, which inspired the name of Leeds band Kaiser Chiefs."],
+    ["Leeds United", "Norman Hunter, the famously tough Leeds defender, was nicknamed “Bites Yer Legs”."],
+    ["Leeds United", "In one of the great FA Cup shocks, Leeds lost the 1973 final to second-tier Sunderland."],
+    ["Leeds United", "Leeds have played their home games at Elland Road ever since the club was founded in 1919."],
+    ["Northampton", "Northampton was once the shoemaking capital of Britain, and is still known as “Shoe Town”."],
+    ["Northampton", "Famous shoemakers Church’s, Crockett & Jones and Tricker’s all started in Northampton."],
+    ["Northampton", "Northampton Town FC are nicknamed “The Cobblers”, after the town’s shoemaking history."],
+    ["Northampton", "Northampton Museum and Art Gallery has one of the biggest collections of historic shoes in the world."],
+    ["Northampton", "Northampton Town rose from the Fourth Division to the First in just five seasons, played one season in the top flight in 1965–66, then fell all the way back down."],
+    ["Northampton", "The Battle of Northampton was fought in 1460, during the Wars of the Roses."],
+    ["Northampton", "Much of Northampton was destroyed in a great fire in 1675."],
+    ["Northampton", "Thomas Becket was put on trial at Northampton Castle in 1164."],
+    ["Northampton", "Charles II ordered Northampton Castle to be pulled down in 1662. A railway station was later built on the site."],
+    ["Northampton", "The Church of the Holy Sepulchre in Northampton is one of only a handful of medieval round churches left in England."],
+    ["Northampton", "The 127-metre National Lift Tower, built in 1982 to test lifts, is nicknamed “the Northampton Lighthouse”."],
+    ["Northampton", "The Eleanor Cross at Hardingstone, on the edge of Northampton, is one of only three original Eleanor crosses still standing. It was built in the 1290s."],
+    ["Northampton", "Delapré Abbey in Northampton was founded around 1145 as a nunnery."],
+    ["Northampton", "Carlsberg opened a brewery in Northampton in 1974, its first outside Denmark."],
+    ["Northampton", "Francis Crick, who helped discover the structure of DNA, was born in Northampton in 1916."],
+    ["Northampton", "Alan Moore, who wrote Watchmen and V for Vendetta, was born in Northampton and still lives there."],
+    ["Northampton", "Doctor Who actor Matt Smith was born in Northampton."],
+    ["Northampton", "Northampton is often described as one of the largest towns in England without city status."],
+    ["Northampton", "Northampton Saints won rugby’s Heineken Cup in 2000, beating Munster 9–8 at Twickenham."],
+    ["Northampton", "Northampton Saints were founded in 1880."],
+    ["Northampton", "Northampton’s Gothic Guildhall was built in the 1860s."],
+    ["Northampton", "Northamptonshire is known as the county of “squires and spires”."],
+    ["Northampton", "Althorp, the Spencer family home and Princess Diana’s resting place, is in Northamptonshire."],
+    ["Northampton", "Silverstone, home of the British Grand Prix, is partly in Northamptonshire. It hosted the first ever Formula One World Championship race in 1950."],
+    ["Northampton", "Northampton’s Market Square is one of the largest market squares in England."],
+    ["Labour Party", "The Labour Party began in 1900 as the Labour Representation Committee, and took the name Labour Party in 1906."],
+    ["Labour Party", "Keir Hardie, a Scottish former miner, was one of Labour’s founders and its first leader in Parliament."],
+    ["Labour Party", "Ramsay MacDonald became the first Labour Prime Minister in January 1924."],
+    ["Labour Party", "Labour first became the official opposition in 1922."],
+    ["Labour Party", "Clement Attlee led Labour to a landslide in 1945, beating Winston Churchill just weeks after VE Day."],
+    ["Labour Party", "Aneurin Bevan, Labour’s health minister, launched the NHS on 5 July 1948."],
+    ["Labour Party", "Attlee’s government nationalised the railways in 1948, creating British Railways."],
+    ["Labour Party", "Harold Wilson won four general elections: 1964, 1966, and both elections of 1974."],
+    ["Labour Party", "The Open University was set up under Harold Wilson’s government and took its first students in 1971."],
+    ["Labour Party", "Harold Wilson is credited with saying “a week is a long time in politics”."],
+    ["Labour Party", "Barbara Castle steered the Equal Pay Act through Parliament in 1970."],
+    ["Labour Party", "Labour MP Ellen Wilkinson helped lead the Jarrow Crusade in 1936, when 200 men marched from Jarrow to London."],
+    ["Labour Party", "Labour’s red rose logo was introduced in 1986, under Neil Kinnock."],
+    ["Labour Party", "Labour’s anthem, “The Red Flag”, was written in 1889 by Jim Connell."],
+    ["Labour Party", "In 1994 Margaret Beckett became the first woman to lead the Labour Party, as acting leader after John Smith died."],
+    ["Labour Party", "Tony Blair rewrote Clause IV of Labour’s constitution in 1995."],
+    ["Labour Party", "Labour won 418 seats in the 1997 landslide."],
+    ["Labour Party", "Tony Blair is the only Labour leader to win three general elections in a row: 1997, 2001 and 2005."],
+    ["Labour Party", "In 1997 Gordon Brown gave the Bank of England the power to set interest rates."],
+    ["Labour Party", "Labour introduced the national minimum wage in 1999."],
+    ["Labour Party", "Gordon Brown was Chancellor for ten years, from 1997 to 2007, the longest continuous run in modern times."],
+    ["Labour Party", "During the 2001 election campaign, Deputy Prime Minister John Prescott punched a protester who had thrown an egg at him."],
+    ["Labour Party", "Keir Starmer became Prime Minister in July 2024 after Labour won 411 seats."],
+    ["Labour Party", "Labour’s 2024 win ended 14 years of Conservative government."],
+    ["Labour Party", "Attlee’s government also brought coal mining into public ownership, in 1947."],
+    ["Islington", "The Angel in Islington is named after the Angel Inn, an old coaching inn on the road into London."],
+    ["Islington", "On the Monopoly board, The Angel, Islington, is one of the cheap light-blue properties, costing £100."],
+    ["Islington", "Tony Blair and Gordon Brown are said to have struck their famous leadership deal in 1994 at Granita, a restaurant on Upper Street."],
+    ["Islington", "Tony Blair lived in Islington before he became Prime Minister in 1997."],
+    ["Islington", "Jeremy Corbyn was first elected MP for Islington North in 1983."],
+    ["Islington", "Emily Thornberry has been MP for Islington South and Finsbury since 2005."],
+    ["Islington", "Arsenal’s Emirates Stadium is in Islington, and so was their old ground, Highbury."],
+    ["Islington", "Arsenal moved from Woolwich to Highbury in 1913 and played there until 2006."],
+    ["Islington", "Highbury was turned into flats after Arsenal left, keeping the old Art Deco stands and making the pitch a garden."],
+    ["Islington", "Sadler’s Wells Theatre stands on a site that has been used for entertainment since 1683, when Richard Sadler opened a music house there."],
+    ["Islington", "The Business Design Centre was originally the Royal Agricultural Hall, which opened in 1862."],
+    ["Islington", "The first Crufts dog show was held at the Royal Agricultural Hall in Islington in 1891."],
+    ["Islington", "In 1962, playwright Joe Orton and Kenneth Halliwell were jailed for defacing Islington library books. The covers are now on display at Islington Museum."],
+    ["Islington", "The Regent’s Canal runs under Islington through a tunnel nearly 900 metres long, which opened in 1820."],
+    ["Islington", "Pentonville Prison on the Caledonian Road opened in 1842."],
+    ["Islington", "George Orwell lived in Canonbury Square from 1944."],
+    ["Islington", "Canonbury Tower dates back to the 1500s, and philosopher Francis Bacon once lived there."],
+    ["Islington", "Thomas Paine is said to have written part of Rights of Man at the Angel Inn."],
+    ["Islington", "The King’s Head on Upper Street opened one of London’s first pub theatres in 1970."],
+    ["Islington", "The Hope and Anchor on Upper Street was a key venue for punk and pub rock in the 1970s."],
+    ["Islington", "The Union Chapel in Islington is a working church that is also one of London’s best-loved music venues."],
+    ["Islington", "Camden Passage in Islington is famous for its antiques market."],
+    ["Islington", "The Almeida Theatre in Islington has premiered many plays that later moved to the West End and Broadway."],
+    ["Islington", "The Estorick Collection in Canonbury is dedicated to modern Italian art."],
+    ["Islington", "Upper Street is said to have one of the highest numbers of bars and restaurants of any street in London."],
+    ["Squash", "Squash is said to have been invented at Harrow School around 1830, when pupils noticed a punctured ball “squashed” when it hit the wall."],
+    ["Squash", "Squash grew out of an older game called rackets, which was first played in London’s Fleet debtors’ prison."],
+    ["Squash", "A cold squash ball hardly bounces, which is why players warm it up before a match."],
+    ["Squash", "The double yellow dot ball, used by professionals, is the slowest and least bouncy squash ball."],
+    ["Squash", "Squash will make its Olympic debut at the 2028 Los Angeles Games."],
+    ["Squash", "Pakistan’s Jahangir Khan went unbeaten for 555 matches between 1981 and 1986, one of the longest winning streaks in any sport."],
+    ["Squash", "Jahangir Khan won the British Open ten years in a row, from 1982 to 1991."],
+    ["Squash", "Jansher Khan won the World Open eight times."],
+    ["Squash", "Hashim Khan won seven British Open titles in the 1950s, having only started competing seriously in his thirties."],
+    ["Squash", "Australian Heather McKay is said to have lost only two matches in her entire career."],
+    ["Squash", "Malaysia’s Nicol David was women’s world number one for 108 months in a row."],
+    ["Squash", "Sheffield’s Nick Matthew won the World Championship three times."],
+    ["Squash", "England’s Laura Massaro became women’s world champion in 2013."],
+    ["Squash", "Egyptian players have dominated professional squash in recent years."],
+    ["Squash", "A squash court is 9.75 metres long and 6.4 metres wide."],
+    ["Squash", "The “tin” at the bottom of the front wall is 48 cm high, or 43 cm in the professional game."],
+    ["Squash", "A squash ball has been hit at 176 mph, by Australian Cameron Pilley in 2011."],
+    ["Squash", "Modern squash games are played to 11 points, and a point is scored on every rally."],
+    ["Squash", "Under the old English scoring system, games went to 9 and only the server could score."],
+    ["Squash", "A “let” means the rally is replayed. A “stroke” means the point is awarded."],
+    ["Squash", "Controlling the “T”, where the court lines meet in the middle, is one of the basic tactics in squash."],
+    ["Squash", "In 2003, Forbes magazine named squash the healthiest sport to play."],
+    ["Squash", "Squash has been part of the Commonwealth Games since 1998."],
+    ["Squash", "The men’s British Open was first held in 1930."],
+    ["Squash", "In squash, the ball can hit the side and back walls as long as it reaches the front wall above the tin."],
+    ["London restaurants & bars", "Rules in Covent Garden, founded in 1798, is London’s oldest restaurant."],
+    ["London restaurants & bars", "Wiltons began as a shellfish stall in 1742 and is one of London’s oldest restaurants."],
+    ["London restaurants & bars", "Veeraswamy on Regent Street opened in 1926 and is the oldest Indian restaurant in the UK still trading."],
+    ["London restaurants & bars", "Simpson’s-in-the-Strand is famous for carving roast beef at the table from silver trolleys."],
+    ["London restaurants & bars", "Sweetings, a City fish restaurant dating from 1889, is known for only opening at lunchtime on weekdays."],
+    ["London restaurants & bars", "The Ivy opened in 1917 and has been a theatreland favourite ever since."],
+    ["London restaurants & bars", "Maison Bertaux in Soho, founded in 1871, is London’s oldest patisserie."],
+    ["London restaurants & bars", "Bar Italia in Soho opened in 1949 and is famous for serving coffee late into the night."],
+    ["London restaurants & bars", "Le Gavroche, opened by the Roux brothers in 1967, was the first restaurant in the UK to win three Michelin stars. It closed in 2024."],
+    ["London restaurants & bars", "Marco Pierre White became the youngest chef ever to win three Michelin stars, in 1995, aged 33."],
+    ["London restaurants & bars", "Gordon Ramsay’s restaurant on Royal Hospital Road earned three Michelin stars in 2001."],
+    ["London restaurants & bars", "St John in Smithfield, opened in 1994, made “nose to tail” eating famous."],
+    ["London restaurants & bars", "The Quo Vadis restaurant in Soho is in the building where Karl Marx lived in the 1850s."],
+    ["London restaurants & bars", "Dishoom’s first restaurant opened in Covent Garden in 2010, inspired by the old Irani cafés of Bombay."],
+    ["London restaurants & bars", "M. Manze on Tower Bridge Road, opened in 1902, is London’s oldest surviving pie and mash shop."],
+    ["London restaurants & bars", "Borough Market claims a history going back around 1,000 years."],
+    ["London restaurants & bars", "The Savoy’s American Bar opened in 1893 and is one of London’s oldest surviving cocktail bars."],
+    ["London restaurants & bars", "Ada Coleman, head bartender at the Savoy’s American Bar, created the Hanky Panky cocktail."],
+    ["London restaurants & bars", "Harry Craddock’s Savoy Cocktail Book, published in 1930, is still used by bartenders today."],
+    ["London restaurants & bars", "Dukes Bar in St James’s is famous for its martinis, and Ian Fleming is said to have been a regular."],
+    ["London restaurants & bars", "Ye Olde Cheshire Cheese on Fleet Street was rebuilt in 1667 after the Great Fire. Charles Dickens drank there."],
+    ["London restaurants & bars", "The George Inn in Southwark is London’s last surviving galleried coaching inn, and it belongs to the National Trust."],
+    ["London restaurants & bars", "The Prospect of Whitby in Wapping claims to be London’s oldest riverside pub, dating back to 1520."],
+    ["London restaurants & bars", "The Mayflower pub in Rotherhithe stands near where the Mayflower set off in 1620."],
+    ["London restaurants & bars", "The Lamb and Flag in Covent Garden was once nicknamed “the Bucket of Blood” because of the bare-knuckle fights held there."]
+  ];
+  var FACT_KEY = 'dadExpenses.factBag';
+  // Shuffled bag of fact numbers, so nothing repeats until every fact has been seen.
+  function nextFact() {
+    var bag = null;
+    try { bag = JSON.parse(localStorage.getItem(FACT_KEY)); } catch (e) {}
+    if (!Array.isArray(bag) || !bag.length || bag.some(function (n) { return typeof n !== 'number' || n < 0 || n >= FACTS.length; })) {
+      bag = FACTS.map(function (_, i) { return i; });
+      for (var i = bag.length - 1; i > 0; i--) { var j = Math.floor(Math.random() * (i + 1)); var t = bag[i]; bag[i] = bag[j]; bag[j] = t; }
+    }
+    var n = bag.pop();
+    try { localStorage.setItem(FACT_KEY, JSON.stringify(bag)); } catch (e) {}
+    return { fact: FACTS[n], seen: FACTS.length - bag.length };
+  }
+  $('factBtn').onclick = function () {
+    var r = nextFact(), text = $('factText');
+    text.classList.add('fade');
+    setTimeout(function () {
+      $('factTag').textContent = r.fact[0];
+      text.textContent = r.fact[1];
+      $('factTag').hidden = false;
+      text.hidden = false;
+      $('factClose').hidden = false;
+      text.classList.remove('fade');
+      $('factCount').textContent = 'Fact ' + r.seen + ' of ' + FACTS.length;
+    }, 180);
+  };
+  $('factClose').onclick = function () {
+    $('factTag').hidden = true;
+    $('factText').hidden = true;
+    $('factClose').hidden = true;
+    $('factCount').textContent = '';
+    $('factBtn').focus();
   };
 
   render();
