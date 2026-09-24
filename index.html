@@ -412,7 +412,7 @@
       <span class="dot" aria-hidden="true"></span>
       <div class="txt">
         <strong>Happy birthday, Dad.</strong>
-        <p>No more receipts in a shoebox. Tap ‚ÄúAdd expense‚Äù, type the amount, done. Love you x</p>
+        <p>No more receipts in a shoebox. Tap “Add expense”, type the amount, done. Love you x</p>
       </div>
       <button type="button" class="link-btn" id="hideBirthday">Dismiss</button>
     </div>
@@ -423,10 +423,10 @@
 
 <main class="wrap">
   <dl class="stats" aria-label="This month at a glance">
-    <div class="stat"><dt>Total spent</dt><dd class="num" id="sTotal">¬£0.00</dd></div>
+    <div class="stat"><dt>Total spent</dt><dd class="num" id="sTotal">£0.00</dd></div>
     <div class="stat"><dt>Expenses</dt><dd class="num" id="sCount">0</dd></div>
-    <div class="stat"><dt>Average</dt><dd class="num" id="sAvg">‚Äî</dd></div>
-    <div class="stat"><dt>Largest</dt><dd class="num" id="sMax">‚Äî</dd></div>
+    <div class="stat"><dt>Average</dt><dd class="num" id="sAvg">—</dd></div>
+    <div class="stat"><dt>Largest</dt><dd class="num" id="sMax">—</dd></div>
   </dl>
 
   <div class="grid">
@@ -479,7 +479,7 @@
     <div class="field" id="fAmount">
       <label class="lbl" for="amount">Amount</label>
       <div class="amount">
-        <span aria-hidden="true">¬£</span>
+        <span aria-hidden="true">£</span>
         <input id="amount" class="num" type="text" inputmode="decimal" autocomplete="off" placeholder="0.00" aria-describedby="eAmount">
       </div>
       <div class="err" id="eAmount" role="alert"></div>
@@ -554,7 +554,7 @@
   function pad(n) { return (n < 10 ? '0' : '') + n; }
   function isoDate(d) { return d.getFullYear() + '-' + pad(d.getMonth() + 1) + '-' + pad(d.getDate()); }
   function parseIso(s) { var p = s.split('-'); return new Date(+p[0], +p[1] - 1, +p[2]); }
-  function money(pence) { return '¬£' + (pence / 100).toLocaleString('en-GB', { minimumFractionDigits: 2, maximumFractionDigits: 2 }); }
+  function money(pence) { return '£' + (pence / 100).toLocaleString('en-GB', { minimumFractionDigits: 2, maximumFractionDigits: 2 }); }
   function monthKey(d) { return d.getFullYear() + '-' + pad(d.getMonth() + 1); }
   function niceDate(s) { return parseIso(s).toLocaleDateString('en-GB', { weekday: 'short', day: 'numeric', month: 'short' }); }
   function dayHeading(s) {
@@ -626,7 +626,7 @@
   function renderChart(list, total) {
     var el = $('chart');
     if (!list.length) {
-      el.innerHTML = '<div class="empty"><div class="ring" aria-hidden="true"></div><strong>Nothing spent yet</strong><p>Once expenses are added, you‚Äôll see where the money goes.</p></div>';
+      el.innerHTML = '<div class="empty"><div class="ring" aria-hidden="true"></div><strong>Nothing spent yet</strong><p>Once expenses are added, you’ll see where the money goes.</p></div>';
       return;
     }
     var byCat = {};
@@ -665,7 +665,7 @@
     if (!list.length) {
       var isNow = viewMonth === monthKey(new Date());
       el.innerHTML = '<div class="empty"><strong>' + (isNow ? 'A clean sheet' : 'Nothing recorded') + '</strong><p>' +
-        (isNow ? 'Nothing added this month yet. Tap ‚ÄúAdd expense‚Äù to record your first one.' : 'There are no expenses saved for ' + esc(niceMonth(viewMonth)) + '.') +
+        (isNow ? 'Nothing added this month yet. Tap “Add expense” to record your first one.' : 'There are no expenses saved for ' + esc(niceMonth(viewMonth)) + '.') +
         '</p></div>';
       return;
     }
@@ -695,12 +695,12 @@
 
     $('sTotal').textContent = money(total);
     $('sCount').textContent = list.length;
-    $('sAvg').textContent = list.length ? money(Math.round(total / list.length)) : '‚Äî';
+    $('sAvg').textContent = list.length ? money(Math.round(total / list.length)) : '—';
     if (list.length) {
       var big = list.reduce(function (a, b) { return b.pence > a.pence ? b : a; });
-      $('sMax').innerHTML = money(max) + '<small>' + esc(catOf(big.cat).name) + ' ¬∑ ' + esc(niceDate(big.date)) + '</small>';
+      $('sMax').innerHTML = money(max) + '<small>' + esc(catOf(big.cat).name) + ' · ' + esc(niceDate(big.date)) + '</small>';
     } else {
-      $('sMax').textContent = '‚Äî';
+      $('sMax').textContent = '—';
     }
 
     renderChart(list, total);
@@ -716,7 +716,7 @@
     var groups = GROUPS.filter(function (g) { return byGroup[g]; }).map(function (g) { return { name: g, pence: byGroup[g] }; });
     return { items: items, groups: groups, total: total };
   }
-  function details(e) { var c = catOf(e.cat); return c.name + (e.note ? ' ‚Äì ' + e.note : ''); }
+  function details(e) { var c = catOf(e.cat); return c.name + (e.note ? ' – ' + e.note : ''); }
 
   function renderReport() {
     var r = reportData();
@@ -880,7 +880,7 @@
     viewMonth = item.date.slice(0, 7);
     render();
     closeSheet();
-    toast(!ok ? 'Couldn‚Äôt save on this device. Try another browser.'
+    toast(!ok ? 'Couldn’t save on this device. Try another browser.'
       : (wasEdit ? 'Changes saved' : money(item.pence) + ' ' + CAT_BY_ID[item.cat].name.toLowerCase() + ' saved'));
   });
 
@@ -903,17 +903,17 @@
     var r = reportData();
     if (!r.items.length) { toast('Nothing to export for this month'); return; }
     var q = function (s) { return '"' + String(s).replace(/"/g, '""') + '"'; };
-    var rows = [['Expense report', niceMonth(viewMonth)], [], ['Date', 'Amount (¬£)', 'Category', 'Details']];
+    var rows = [['Expense report', niceMonth(viewMonth)], [], ['Date', 'Amount (£)', 'Category', 'Details']];
     r.items.forEach(function (e) {
       rows.push([parseIso(e.date).toLocaleDateString('en-GB'), (e.pence / 100).toFixed(2), catOf(e.cat).group, details(e)]);
     });
     rows.push(['TOTAL', (r.total / 100).toFixed(2)]);
     rows.push([]);
     rows.push(['Summary by category']);
-    rows.push(['Category', 'Amount (¬£)']);
+    rows.push(['Category', 'Amount (£)']);
     r.groups.forEach(function (g) { rows.push([g.name, (g.pence / 100).toFixed(2)]); });
     rows.push(['TOTAL', (r.total / 100).toFixed(2)]);
-    var csv = 'Ôªø' + rows.map(function (r) { return r.map(q).join(','); }).join('\r\n');
+    var csv = '﻿' + rows.map(function (r) { return r.map(q).join(','); }).join('\r\n');
     download('expenses-' + viewMonth + '.csv', csv, 'text/csv;charset=utf-8');
     toast('Saved a file for your accountant');
   };
@@ -946,7 +946,7 @@
         render();
         toast(added ? 'Loaded ' + added + ' expenses from backup' : 'Nothing new in that backup');
       } catch (e) {
-        toast('That doesn‚Äôt look like a backup file');
+        toast('That doesn’t look like a backup file');
       }
     };
     reader.readAsText(file);
